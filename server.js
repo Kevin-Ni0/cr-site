@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const fetch = require('node-fetch');
@@ -7,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const CR_API_KEY = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6ImRlN2RiMDdmLWUwNzYtNGQyNC05ZDdmLWM5ODYzZjdjZjAyNSIsImlhdCI6MTc3ODcyNjc1Miwic3ViIjoiZGV2ZWxvcGVyLzAyNTU1ZDA1LTkxNzctMzZlMy1lYTJmLTA0MzMzOTNmNDY3MCIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyIxNzMuNTYuMjA1Ljk0Il0sInR5cGUiOiJjbGllbnQifV19.jWTe6UoJQXDS4Z6G1msd91MsCG2RfHBKYIYvVZXyIIUCsi5Bf3SFxmmdKY9yW8enId4Yl64SBuhop_KQrCzgHw'; // 👈 your key here
+const CR_API_KEY = process.env.CR_API_KEY;
 
 const rarityStartLevel = {
   common: 1,
@@ -75,15 +76,14 @@ allCards.forEach(card => {
     console.log('POSSIBLE TOWER TROOP:', card.name, '| elixirCost:', card.elixirCost, '| rarity:', card.rarity);
   }
 });
-console.log('Total allCards:', allCards.length, '| Global cards list:', cardsData.items?.length);
-console.log('supportCards:', JSON.stringify(playerData.supportCards, null, 2));    
-
-res.json(playerData);
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error. Please try again.' });
   }
 });
 
-app.listen(3000, () => console.log('Server running on http://localhost:3000'));
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
