@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CR Collection Level · May 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #F5A623; --gold-dark: #C4791A; --gold-glow: rgba(245,166,35,0.18);
+    --bg: #0D0E14; --bg2: #13151F; --bg3: #1B1E2B;
+    --border: rgba(255,255,255,0.07); --border-gold: rgba(245,166,35,0.3);
+    --text: #F0EEE8; --muted: #6B6E7E;
+    --danger: #E05252; --danger-bg: rgba(224,82,82,0.12);
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(245,166,35,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(245,166,35,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+  body::after { content: ''; position: fixed; top: -20%; left: 50%; transform: translateX(-50%); width: 800px; height: 500px; background: radial-gradient(ellipse, rgba(245,166,35,0.06) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+  .page { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; padding: 0 24px 80px; }
+  header { padding: 48px 0 40px; text-align: center; animation: fadeUp 0.6s ease both; }
+  .header-badge { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--border-gold); border-radius: 100px; padding: 4px 14px; margin-bottom: 20px; background: var(--gold-glow); }
+  h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(52px, 10vw, 80px); letter-spacing: 0.03em; line-height: 0.9; margin-bottom: 16px; }
+  h1 span { color: var(--gold); }
+  .subtitle { font-size: 15px; color: var(--muted); max-width: 380px; margin: 0 auto; line-height: 1.6; }
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 28px; margin-bottom: 16px; animation: fadeUp 0.6s ease both; }
+  .card-title { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; }
+  .search-row { display: flex; gap: 10px; }
+  .search-row input { flex: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; font-family: 'DM Sans', sans-serif; font-size: 16px; color: var(--text); outline: none; transition: border-color 0.2s, box-shadow 0.2s; text-transform: uppercase; }
+  .search-row input::placeholder { text-transform: none; color: var(--muted); }
+  .search-row input:focus { border-color: var(--border-gold); box-shadow: 0 0 0 3px var(--gold-glow); }
+  .btn-lookup { padding: 14px 24px; border-radius: 10px; border: none; background: var(--gold); color: #0D0E14; font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.08em; cursor: pointer; transition: opacity 0.2s, transform 0.15s; white-space: nowrap; }
+  .btn-lookup:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-lookup:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .hint { font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.6; }
+  .error-box { display: none; background: var(--danger-bg); border: 1px solid rgba(224,82,82,0.3); border-radius: 10px; padding: 12px 16px; font-size: 13px; color: var(--danger); margin-top: 12px; }
+  .loading { display: none; text-align: center; padding: 32px; color: var(--muted); font-size: 14px; }
+  .spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 12px; }
+  #results { display: none; }
+  .player-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+  .avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--gold-glow); border: 1px solid var(--border-gold); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--gold); flex-shrink: 0; }
+  .player-info p:first-child { font-size: 18px; font-weight: 600; }
+  .player-info p:last-child { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .king-badge { margin-left: auto; text-align: right; flex-shrink: 0; }
+  .king-badge span:first-child { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .king-badge span:last-child { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--gold); }
+  .collection-hero { text-align: center; padding: 32px 20px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+  .collection-hero .label { font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .collection-hero .big-num { font-family: 'Bebas Neue', sans-serif; font-size: clamp(64px, 16vw, 96px); color: var(--gold); letter-spacing: 0.02em; line-height: 1; }
+  .collection-hero .of-max { font-size: 14px; color: var(--muted); margin-top: 4px; }
+  .progress-wrap { margin-bottom: 24px; }
+  .progress-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .progress-track { height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dark), var(--gold)); border-radius: 3px; width: 0%; transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
+  .stat-box { background: var(--bg3); border-radius: 10px; padding: 14px 12px; text-align: center; border: 1px solid var(--border); }
+  .stat-box .s-val { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--text); }
+  .stat-box .s-label { font-size: 11px; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; line-height: 1.3; }
+  .breakdown { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .breakdown tr { border-bottom: 1px solid var(--border); }
+  .breakdown tr:last-child { border-bottom: none; }
+  .breakdown td { padding: 10px 0; color: var(--muted); }
+  .breakdown td:last-child { text-align: right; color: var(--text); font-weight: 500; }
+  .breakdown tr.total-row td { color: var(--text); font-weight: 600; }
+  .breakdown tr.total-row td:last-child { color: var(--gold); font-size: 15px; }
+  .formula-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 20px 28px; animation: fadeUp 0.6s ease 0.2s both; }
+  .formula-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .formula-row:last-child { border-bottom: none; }
+  .formula-chip { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--gold); min-width: 40px; }
+  .formula-desc { color: var(--muted); }
+  footer { text-align: center; padding: 32px 0; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 40px; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="header-badge">May 2026 Update · Season 84</div>
+    <h1>COLLECTION<br><span>LEVEL</span></h1>
+    <p class="subtitle">Look up any player's new Collection Level under Clash Royale's updated progression system.</p>
+  </header>
+  <div class="card">
+    <p class="card-title">Player Lookup</p>
+    <div class="search-row">
+      <input type="text" id="tag-input" placeholder="Enter player tag (e.g. #ABC123)" spellcheck="false" />
+      <button class="btn-lookup" id="fetch-btn" onclick="fetchPlayer()">GO</button>
+    </div>
+    <p class="hint">Your player tag is shown in-game under your name — it starts with #.</p>
+    <div class="error-box" id="error-box"></div>
+  </div>
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    Fetching from Clash Royale servers...
+  </div>
+  <div id="results">
+    <div class="card">
+      <div class="player-header">
+        <div class="avatar" id="avatar-initials">CR</div>
+        <div class="player-info">
+          <p id="player-name">—</p>
+          <p id="player-tag-display">—</p>
+        </div>
+        <div class="king-badge">
+          <span>King Level</span>
+          <span id="king-level">—</span>
+        </div>
+      </div>
+      <div class="collection-hero">
+        <p class="label">Your Collection Level</p>
+        <p class="big-num" id="col-level">—</p>
+        <p class="of-max">out of <strong>2,260</strong> max</p>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-meta">
+          <span>Progress to max</span>
+          <span id="progress-pct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="s-val" id="stat-cards">—</div><div class="s-label">Cards tracked</div></div>
+        <div class="stat-box"><div class="s-val" id="stat-card-lvl">—</div><div class="s-label">From cards</div></div>
+        <div class="stat-box"><div class="s-val" id="stat-evo-lvl">—</div><div class="s-label">From evos & heroes</div></div>
+      </div>
+      <p class="card-title">Breakdown</p>
+      <table class="breakdown"><tbody id="breakdown-body"></tbody></table>
+    </div>
+  </div>
+  <div class="formula-card">
+    <p class="card-title" style="margin-bottom:12px;">How Collection Level works</p>
+    <div class="formula-row"><span class="formula-chip">+1</span><span class="formula-desc">per level on each card or tower troop (max 16 levels)</span></div>
+    <div class="formula-row"><span class="formula-chip">+5</span><span class="formula-desc">per level on each evolution or hero (5 levels each)</span></div>
+    <div class="formula-row"><span class="formula-chip">2,260</span><span class="formula-desc">maximum at launch · increases as new cards & evos are released</span></div>
+  </div>
+  <footer>Not affiliated with Supercell · Clash Royale May 2026 update</footer>
+</div>
+<script>
+async function fetchPlayer() {
+  const rawTag = document.getElementById('tag-input').value.trim();
+  const errBox = document.getElementById('error-box');
+  const loading = document.getElementById('loading');
+  const results = document.getElementById('results');
+  errBox.style.display = 'none';
+  results.style.display = 'none';
+  if (!rawTag) { showErr('Please enter a player tag.'); return; }
+  const tag = (rawTag.startsWith('#') ? rawTag : '#' + rawTag).toUpperCase();
+  loading.style.display = 'block';
+  document.getElementById('fetch-btn').disabled = true;
+  try {
+    const res = await fetch(`/api/player/${encodeURIComponent(tag)}`);
+    const data = await res.json();
+    loading.style.display = 'none';
+    document.getElementById('fetch-btn').disabled = false;
+    if (!res.ok) { showErr(data.error || 'Player not found. Check the tag and try again.'); return; }
+    renderResults(data);
+  } catch (e) {
+    loading.style.display = 'none';
+    document.getElementById('fetch-btn').disabled = false;
+    showErr('Could not reach the server. Please try again.');
+  }
+}
+function renderResults(data) {
+  const name = data.name || 'Unknown';
+  document.getElementById('player-name').textContent = name;
+  document.getElementById('player-tag-display').textContent = data.tag || '';
+  document.getElementById('king-level').textContent = data.expLevel || '1';
+  document.getElementById('avatar-initials').textContent = name.slice(0, 2).toUpperCase();
+
+const rarityOffset = { common: 0, rare: 2, epic: 5, legendary: 8, champion: 10 };
+
+function normalizeLevel(card) {
+  const offset = rarityOffset[card.rarity] || 0;
+  const displayLevel = (card.level || 1) + offset;
+  return Math.min(displayLevel, 16);
+}
+  const cards = data.cards || [];
+  const supportCards = data.supportCards || [];
+  let cardsLevels = 0, evoLevels = 0, evoCount = 0;
+
+  // Regular cards
+  cards.forEach(card => {
+    const isHero = !!card.iconUrls?.heroMedium || !!card.isUnownedHero;
+    const isEvo = !!card.iconUrls?.evolutionMedium || !!card.isUnownedEvo;
+    const hasEvoOrHeroUnlocked = card.evolutionLevel != null;
+
+    cardsLevels += normalizeLevel(card);
+
+    if (isEvo && hasEvoOrHeroUnlocked) { evoLevels += 5; evoCount++; }
+    if (isHero && hasEvoOrHeroUnlocked) { evoLevels += 5; evoCount++; }
+  });
+
+  // Tower troops
+  supportCards.forEach(card => {
+    cardsLevels += normalizeLevel(card);
+  });
+
+  const total = cardsLevels + evoLevels;
+  const pct = Math.min(100, Math.round((total / 2260) * 100));
+
+  document.getElementById('col-level').textContent = total.toLocaleString();
+  document.getElementById('progress-pct').textContent = pct + '%';
+  setTimeout(() => { document.getElementById('progress-fill').style.width = pct + '%'; }, 80);
+  document.getElementById('stat-cards').textContent = (cards.length + supportCards.length).toLocaleString();
+  document.getElementById('stat-card-lvl').textContent = cardsLevels.toLocaleString();
+  document.getElementById('stat-evo-lvl').textContent = evoLevels.toLocaleString();
+
+  const tbody = document.getElementById('breakdown-body');
+  tbody.innerHTML = '';
+  [
+    { label: `Cards & tower troops (${cards.length + supportCards.length})`, val: cardsLevels },
+    { label: `Evolutions & heroes (${evoCount})`, val: evoLevels }
+  ].forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${r.label}</td><td>+${r.val.toLocaleString()}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  const totalRow = document.createElement('tr');
+  totalRow.className = 'total-row';
+  totalRow.innerHTML = `<td>Total Collection Level</td><td>${total.toLocaleString()}</td>`;
+  tbody.appendChild(totalRow);
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function showErr(msg) { const e = document.getElementById('error-box'); e.textContent = msg; e.style.display = 'block'; }
+document.getElementById('tag-input').addEventListener('keydown', e => { if (e.key === 'Enter') fetchPlayer(); });
+</script>
+</body>
+</html>
