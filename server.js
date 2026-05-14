@@ -36,8 +36,16 @@ app.get('/api/player/:tag', async (req, res) => {
     const cardsData = await cardsRes.json();
 
     if (!playerRes.ok) {
-      return res.status(playerRes.status).json({ error: playerData.message || 'Player not found' });
-    }
+  return res.status(playerRes.status).json({
+    error: playerData.message || 'Player not found'
+  });
+}
+
+if (!cardsRes.ok) {
+  return res.status(cardsRes.status).json({
+    error: 'Failed to fetch cards data'
+  });
+}
 
     // Build a map of owned cards by id
     const owned = {};
@@ -76,10 +84,13 @@ allCards.forEach(card => {
     console.log('POSSIBLE TOWER TROOP:', card.name, '| elixirCost:', card.elixirCost, '| rarity:', card.rarity);
   }
 });
+
+res.json(playerData);
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error. Please try again.' });
-  }
+  console.error("FULL ERROR:", err);
+  res.status(500).json({ error: err.message });
+}
 });
 
 const PORT = process.env.PORT || 3000;
